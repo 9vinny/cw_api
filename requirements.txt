@@ -1,10 +1,6 @@
-Flask==1.0.2
-Flask-Cors==3.0.7
-mysql-connector-python==8.0.16
-mysqlclient==1.4.2.post1
-path.py==11.5.0
-pathlib2==2.3.3
+Flask
+Flask-Cors
+mysql-connector-python
+mysqlclient
 plaid-python==3.1.1
-pycurl==7.43.0.2
-Jinja2==2.10
 jsonschema==2.6.0
