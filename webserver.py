@@ -392,6 +392,44 @@ def drive_list():
     return Response(result, status=status_code, mimetype='application/json')
 
 
+@app.route('/drive_engagement_feed', methods=["POST"])
+def engagement_feed():
+    if request.headers['Content-Type'] == 'application/json':
+        arguments = request.get_json()
+        user_id = arguments.get("user_id")
+        drive_id = arguments.get("drive_id")
+
+        if user_id is None:
+            user_id=0
+
+        if drive_id is None:
+            drive_id=0
+
+        response={}
+
+        try:
+            #get all listed charities from
+            response["drive_engagement_feed"] = get_drive_updates(int(user_id),int(drive_id))
+            status_code = 200
+            logging.info(response)
+
+        except Exception as e:
+            status_code = 400
+            status = e
+            message="{}".format(status)
+            logging.info(message)
+            response['message']=message
+
+
+    else:
+        status_code = 400
+        logging.warning("Bad Request Format")
+        response['message']="Bad Request Format"
+
+    result=json.dumps(response)
+
+    return Response(result, status=status_code, mimetype='application/json')
+
 
 @app.route('/admin_job_trigger', methods=["POST"])
 def bir_test():

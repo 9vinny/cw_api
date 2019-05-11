@@ -64,6 +64,64 @@ def get_charities(uid):
         db_obj.close_conn()
 
 
+def get_drive_updates(uid,drive_id):
+    """fetches updates from drive_update table"""
+    drive_updates=[]
+    try:
+        db_obj=SqlConn()
+        if uid != 0:
+            print("user feed")
+            query="Select A.charity_id,A.char_name, A.char_image, B.drive_id, B.name, B.drive_image, \
+            B.upd_id,B.drive_update,B.update_image from charity A, \
+            (Select a.upd_id,a.drive_update,a.update_image, b.drive_id,b.name,b.drive_image,b.charity_id \
+            from drive_update a, drive b where a.drive_id=b.drive_id and b.drive_id \
+            in (Select drive_id from donor_drive where donor_id=%s and status=%s)) B where A.charity_id = B.charity_id"
+            data = (uid,True,)
+
+        elif drive_id != 0:
+            print("drive feed")
+            query="Select A.charity_id,A.char_name, A.char_image, B.drive_id, B.name, B.drive_image, \
+            B.upd_id,B.drive_update,B.update_image from charity A, \
+            (Select a.upd_id,a.drive_update,a.update_image, b.drive_id,b.name,b.drive_image,b.charity_id \
+            from drive_update a, drive b where a.drive_id=b.drive_id) B\
+            where A.charity_id = B.charity_id and B.drive_id=%s"
+            data = (drive_id,)
+
+        result=db_obj.get_query(query,data)
+        print(query,data,result)
+        if len(result)>0:
+            print("db queried")
+            for record in result:
+                logging.info(record)
+                num_donor=((5),)
+
+                r={'charity_id':record[0],
+                'charityName':record[1],
+                'charityImageURL': record[2],
+                'drive_id':record[3],
+                'driveTitle':record[4],
+                'driveImageURL':record[5],
+                'update_id':record[6],
+                'feedMessage':record[7],
+                'feedImageURL':record[8],
+                'numDonations':num_donor[0]
+                }
+                drive_updates.append(r)
+        else:
+            if uid==0 and drive_id!=0:
+                raise Exception("No updates present for the drive.")
+            elif uid!=0 and drive_id==0:
+                raise Exception("No updates for your drives. Support more drives to see how your change is changing the world.")
+
+        return drive_updates
+
+    except Exception as e:
+        logging.info(e)
+        raise
+    finally:
+        db_obj.close_conn()
+
+
 
 def get_drives(uid=0,source_page=0):
     """fetches drives from drive table"""
