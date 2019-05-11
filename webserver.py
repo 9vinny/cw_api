@@ -418,3 +418,8 @@ def bir_test():
 
     result=json.dumps(response)
     return Response(result, status=status_code, mimetype='application/json')
+
+
+
+if __name__ == '__main__':
+    application.run(host='0.0.0.0')
