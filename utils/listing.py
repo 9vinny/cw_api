@@ -310,40 +310,42 @@ def get_recommended_drives(uid):
                     drives.append(drive[0])
                 print("rd: ",result_drives)
             drive_ids=list(set(drives))
+            if len(drive_ids)>0:
+                query3="Select A.*,B.char_name from drive A, charity B where drive_id in %s and A.charity_id=B.charity_id"
+                data3 = (drive_ids,)
+                result_drives=db_obj.get_query(query3,data3)
 
-            query3="Select A.*,B.char_name from drive A, charity B where drive_id in %s and A.charity_id=B.charity_id"
-            data3 = (drive_ids,)
-            result_drives=db_obj.get_query(query3,data3)
+                drives=[]
 
-            drives=[]
+                for record in result_drives:
 
-            for record in result_drives:
+                    num_donor=((5),)
 
-                num_donor=((5),)
+                    userDrive=False
 
-                userDrive=False
+                    if record[11]==1:
+                        if record[-1]:
+                            isd=True
+                        else:
+                            isd=False
 
-                if record[11]==1:
-                    if record[-1]:
-                        isd=True
-                    else:
-                        isd=False
+                    r={'drive_id':record[0],'charity_id':record[1],'driveTitle':record[2],
+                    'charityName':record[-1],
+                    'driveAbout': record[3],
+                    'driveImageURL':record[4],
+                    'targetMoney':record[5], 'currentMoney':record[6],
+                    'driveCity':record[7],
+                    'driveState':record[8],
+                    'causes':record[12].split(","),
+                    'percentCompleted':float(record[6]/record[5]),'is_default':isd,
+                    'numDonations':num_donor[0],
+                    'userSelected':userDrive
+                    }
+                    drives.append(r)
 
-                r={'drive_id':record[0],'charity_id':record[1],'driveTitle':record[2],
-                'charityName':record[-1],
-                'driveAbout': record[3],
-                'driveImageURL':record[4],
-                'targetMoney':record[5], 'currentMoney':record[6],
-                'driveCity':record[7],
-                'driveState':record[8],
-                'causes':record[12].split(","),
-                'percentCompleted':float(record[6]/record[5]),'is_default':isd,
-                'numDonations':num_donor[0],
-                'userSelected':userDrive
-                }
-                drives.append(r)
-
-            return drives
+                return drives
+            else:
+                raise Exception("No Recommended Drives")
 
 
     except Exception as e:

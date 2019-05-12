@@ -547,6 +547,54 @@ def engagement_feed():
     return Response(result, status=status_code, mimetype='application/json')
 
 
+@app.route('/donate_now', methods=['POST'])
+def donate_now():
+    response={}
+    if request.headers['Content-Type'] == 'application/json':
+        arguments = request.get_json()
+        user_id = arguments.get("user_id")
+        amount = arguments.get("amount")
+        status=""
+        try:
+            session_flag= check_session(int(user_id))
+            if session_flag:
+                donor_obj=Donor(user_id)
+                if amount is None:
+                    status, message=donor_obj.make_donation()
+                else:
+                    status, message=donor_obj.make_donation(amount)
+                if status:
+                    status_code = 200
+                    logging.info(message)
+                    response['message']=message
+                else:
+                    status_code = 400
+                    logging.info(message)
+                    response['message']=message
+
+            else:
+                status_code = 400
+                message="Session Inactive, Login Again"
+                logging.info(message)
+                response['message']=message
+
+        except Exception as e:
+            status_code = 400
+            status = e
+            message="Error:{}".format(status)
+            logging.info(message)
+            response['message']=message
+
+    else:
+        status_code = 400
+        logging.warning("Bad Request Format")
+        response['message']="Bad Request Format"
+
+    result=json.dumps(response)
+
+    return Response(result, status=status_code, mimetype='application/json')
+
+
 @app.route('/admin_job_trigger', methods=["POST"])
 def bir_test():
     if request.headers['Content-Type'] == 'application/json':
