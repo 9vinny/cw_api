@@ -7,9 +7,11 @@ import json
 from classes.plaid_transaction import PlaidTransaction
 
 PLAID_CLIENT_ID = '5cb0ce482db15200120fb445'
-PLAID_SECRET = '4c61d2dfdff1021b50b7cd146bcf9a'
+# PLAID_SECRET = '4c61d2dfdff1021b50b7cd146bcf9a' #development
+PLAID_SECRET = '8b33b5d685f70591320f566ad87901' #sandbox
 PLAID_PUBLIC_KEY = '0cfea3b8cf3611b374aecb1a215a39'
-PLAID_ENV =  'development'
+# PLAID_ENV =  'development'
+PLAID_ENV =  'sandbox'
 PLAID_PRODUCTS = 'transactions,auth'
 
 
