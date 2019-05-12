@@ -206,7 +206,7 @@ def get_drives(uid=0,source_page=0):
         db_obj.close_conn()
 
 def get_charity_drives(cid,uid=0):
-    """fetches drives from drive table"""
+    """fetches drives from drive table for the charity"""
     drives=[]
     try:
         db_obj=SqlConn()
@@ -276,6 +276,76 @@ def get_charity_drives(cid,uid=0):
             raise Exception("No Drives Found")
         print("drives",drives)
         return drives
+    except Exception as e:
+        logging.info(e)
+        raise
+    finally:
+        db_obj.close_conn()
+
+
+def get_recommended_drives(uid):
+    """fetches drives from drive table based on user fav causes"""
+    drives=[]
+    try:
+        db_obj=SqlConn()
+
+        query="Select fav_causes from donor where donor_id=%s"
+        data = (uid,)
+
+        causes=db_obj.get_query(query,data)
+
+        print(causes)
+        if causes[0][0] is None:
+            return get_drives(uid,0)
+        else:
+            cause_list=causes[0][0].split(",")
+            drives=[]
+            for cause in cause_list:
+                print(cause)
+                query2="Select drive_id from drive where find_in_set(%s,causes) and active_status = True"
+                data2 = (cause,)
+                result_drives=db_obj.get_query(query2,data2)
+                # drives.add(result_drives[0])
+                for drive in result_drives:
+                    drives.append(drive[0])
+                print("rd: ",result_drives)
+            drive_ids=list(set(drives))
+
+            query3="Select A.*,B.char_name from drive A, charity B where drive_id in %s and A.charity_id=B.charity_id"
+            data3 = (drive_ids,)
+            result_drives=db_obj.get_query(query3,data3)
+
+            drives=[]
+
+            for record in result_drives:
+
+                num_donor=((5),)
+
+                userDrive=False
+
+                if record[11]==1:
+                    if record[-1]:
+                        isd=True
+                    else:
+                        isd=False
+
+                r={'drive_id':record[0],'charity_id':record[1],'driveTitle':record[2],
+                'charityName':record[-1],
+                'driveAbout': record[3],
+                'driveImageURL':record[4],
+                'targetMoney':record[5], 'currentMoney':record[6],
+                'driveCity':record[7],
+                'driveState':record[8],
+                'causes':record[12].split(","),
+                'percentCompleted':float(record[6]/record[5]),'is_default':isd,
+                'numDonations':num_donor[0],
+                'userSelected':userDrive
+                }
+                drives.append(r)
+
+            return drives
+
+
     except Exception as e:
         logging.info(e)
         raise

@@ -4,7 +4,7 @@ import logging
 import time
 from classes.auth import Auth
 from classes.donor import Donor
-from utils.session import start_session, check_session, end_session
+from utils.session import *
 from utils.plaid import *
 from utils.listing import *
 from utils.donation import *
@@ -224,7 +224,6 @@ def select_user_causes():
     result=json.dumps(response)
 
     return Response(result, status=status_code, mimetype='application/json')
-
 
 @app.route('/set_ptoken', methods=['POST'])
 def plaid_access_token_gen():
@@ -462,6 +461,42 @@ def drive_list():
         #     status_code = 400
         #     logging.warning("Something wierd has happened - Contact Bir")
         #     response['message']="Something wierd has happened - Contact Bir"
+
+    else:
+        status_code = 400
+        logging.warning("Bad Request Format")
+        response['message']="Bad Request Format"
+
+    result=json.dumps(response)
+
+    return Response(result, status=status_code, mimetype='application/json')
+
+
+@app.route('/recommended_drives', methods=["POST"])
+def recommended_drives():
+    if request.headers['Content-Type'] == 'application/json':
+        arguments = request.get_json()
+        user_id = arguments.get("user_id")
+
+        response={}
+        try:
+            #get all drives if no user_id
+            if user_id is None or user_id==0:
+                user_id=0
+                response["drives"]= get_drives(user_id,0)
+            else:
+                response["drives"]= get_recommended_drives(user_id)
+
+            status_code = 200
+            logging.info(response)
+
+        except Exception as e:
+            status_code = 400
+            status = e
+            message="{}".format(status)
+            logging.info(message)
+            response['message']=message
+
 
     else:
         status_code = 400
