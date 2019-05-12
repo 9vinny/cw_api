@@ -35,12 +35,9 @@ class Donor(object):
     def sync_to_db(self):
         pass
 
-    def set_profile(self, name, fav_causes):
+    def set_name(self, name, fav_causes):
         """Saves user profile details"""
-        self.name =name
-        self.last_logged_in = datetime.datetime.now()
-        self.fav_causes =fav_causes
-
+        self.name=name
         try:
             db_obj=SqlConn()
 
@@ -50,7 +47,7 @@ class Donor(object):
         finally:
             db_obj.close_conn()
 
-    def get_profile(self, name, fav_causes):
+    def get_name(self, name, fav_causes):
         pass
 
 
@@ -86,21 +83,34 @@ class Donor(object):
             db_obj.close_conn()
 
 
-
-
     def set_access_token(self, item_id, access_token):
         #update in obj and save to db
 
         try:
             db_obj=SqlConn()
-            query="Update donor set plaid_item_id= %s, plaid_access_token=%s, last_logged_in=%s,\
+            query="Update donor set plaid_item_id= %s, plaid_access_token=%s, \
             donation_cycle_start_date=%s where donor_id = %s"
-            data = (item_id,access_token, datetime.datetime.now(), datetime.datetime.now(),self.uid,)
+            data = (item_id,access_token, datetime.datetime.now(), self.uid,)
             db_obj.set_query(query,data)
             self.plaid_item=item_id
             self.plaid_access_token=access_token
             return True
 
+        except Exception as e:
+            logging.info(e)
+            raise
+        finally:
+            db_obj.close_conn()
+
+    def set_causes(self, causes):
+        #update in obj and save to db
+        try:
+            db_obj=SqlConn()
+            query="Update donor set fav_causes= %s where donor_id = %s"
+            data = (','.join([str(x) for x in causes]),self.uid,)
+            print(data)
+            db_obj.set_query(query,data)
+            self.fav_causes=causes
         except Exception as e:
             logging.info(e)
             raise

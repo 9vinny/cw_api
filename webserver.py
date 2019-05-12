@@ -186,6 +186,46 @@ def user_totals():
     return Response(result, status=status_code, mimetype='application/json')
 
 
+@app.route('/select_causes', methods=['POST'])
+def select_user_causes():
+    response={}
+    if request.headers['Content-Type'] == 'application/json':
+        arguments = request.get_json()
+        user_id = arguments.get("user_id")
+        cause_list = arguments.get("causes")
+        status=""
+        try:
+            session_flag= check_session(int(user_id))
+            if session_flag:
+                donor_obj=Donor(user_id)
+                donor_obj.set_causes(cause_list)
+                status_code = 200
+                message="Causes saved successfully"
+                logging.info(message)
+                response['message']=message
+            else:
+                status_code = 400
+                message="Session Inactive, Login Again"
+                logging.info(message)
+                response['message']=message
+
+        except Exception as e:
+            status_code = 400
+            status = e
+            message="Error:{}".format(status)
+            logging.info(message)
+            response['message']=message
+
+    else:
+        status_code = 400
+        logging.warning("Bad Request Format")
+        response['message']="Bad Request Format"
+
+    result=json.dumps(response)
+
+    return Response(result, status=status_code, mimetype='application/json')
+
+
 @app.route('/set_ptoken', methods=['POST'])
 def plaid_access_token_gen():
     response={}
