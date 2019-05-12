@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS plaid_transaction (
     transaction_id INTEGER AUTO_INCREMENT PRIMARY KEY,
     donor_id INTEGER NOT NULL REFERENCES donor(donor_id),
     entry_date DATETIME NOT NULL,
-    plaid_transaction_id VARCHAR(255) NOT NULL UNIQUE,
+    plaid_transaction_id VARCHAR(255) NOT NULL,
     plaid_transaction_name VARCHAR(255) NOT NULL,
     plaid_transaction_city VARCHAR(255),
     plaid_transaction_type VARCHAR(255) NOT NULL,

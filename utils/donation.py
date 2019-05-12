@@ -8,6 +8,9 @@ def calculate_donor_month_total():
 
 def make_donations():
     """make donations for users who have selected drives"""
+    #get user_id and amts for active donors
+    #make donation entry
+    #reset donation cycle date as curr date, update accumulated amount zer, update ltd amount
     pass
 
 

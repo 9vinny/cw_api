@@ -8,6 +8,7 @@ from utils.session import start_session, check_session, end_session
 from utils.plaid import *
 from utils.listing import *
 from utils.donation import *
+
 import datetime
 
 print("App load")
@@ -221,6 +222,46 @@ def plaid_access_token_gen():
     result=json.dumps(response)
 
     return Response(result, status=status_code, mimetype='application/json')
+
+
+@app.route('/get_spending_account', methods=['POST'])
+def get_spending_account():
+    response={}
+    if request.headers['Content-Type'] == 'application/json':
+        arguments = request.get_json()
+        user_id = arguments.get("user_id")
+        print("user_id",user_id)
+        status=""
+        try:
+            #check session
+            session_flag= check_session(int(user_id))
+            if session_flag:
+                current_user=Donor(user_id)
+                response["accounts"]= get_account_info_from_plaid(user_id)
+                status_code = 200
+                logging.info(response)
+            else:
+                status_code = 400
+                message="Session Inactive, Login Again"
+                logging.warning(message)
+                response['message']=message
+
+        except Exception as e:
+            status_code = 400
+            status = e
+            message="Error:{}".format(status)
+            logging.warning(message)
+            response['message']=message
+
+    else:
+        status_code = 400
+        logging.warning("Bad Request Format")
+        response['message']="Bad Request Format"
+
+    result=json.dumps(response)
+
+    return Response(result, status=status_code, mimetype='application/json')
+
 
 
 @app.route('/get_charities', methods=["POST"])
@@ -446,7 +487,11 @@ def bir_test():
             status_code = 200
         elif action==2:
             # calculate_donor_month_total()
-            response["message"]="works externally"
+            response["message"]="API works"
+            status_code = 200
+        elif action==3:
+            # calculate_donor_month_total()
+            response["message"]=make_donations()
             status_code = 200
         elif action==0:
             print(datetime.datetime.now().replace(day=1))
