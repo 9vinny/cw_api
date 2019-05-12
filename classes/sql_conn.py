@@ -8,8 +8,8 @@ class SqlConn(object):
     def __init__(self):
         """Class to connect with MYSQL db"""
 
-        # self.db = MySQLdb.connect("charitywallet.ckjkftdengvx.us-west-1.rds.amazonaws.com", "root", "capstone", "charity_wallet")
-        self.db = MySQLdb.connect("localhost", "root", "capstone", "charity_wallet")
+        self.db = MySQLdb.connect("charitywallet.ckjkftdengvx.us-west-1.rds.amazonaws.com", "root", "capstone", "charity_wallet")
+        # self.db = MySQLdb.connect("localhost", "root", "capstone", "charity_wallet")
         self.cursor = self.db.cursor()
 
 
