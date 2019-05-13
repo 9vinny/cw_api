@@ -1,5 +1,6 @@
 from classes.sql_conn import SqlConn
 import logging
+from random import randint
 
 def get_charities(uid):
     """fetches charities from charity table"""
@@ -93,7 +94,7 @@ def get_drive_updates(uid,drive_id):
             print("db queried")
             for record in result:
                 logging.info(record)
-                num_donor=((5),)
+                num_donor=((randint(0, 20)),)
 
                 r={'charity_id':record[0],
                 'charityName':record[1],
@@ -141,7 +142,7 @@ def get_drives(uid=0,source_page=0):
 
         result=db_obj.get_query(query,data)
 
-        query2="Select charity_id,char_name from charity"
+        query2="Select charity_id,char_name,charity_nav_score,tax_deductible from charity"
         data2=None
 
         result_charities=db_obj.get_query(query2,data2)
@@ -168,14 +169,26 @@ def get_drives(uid=0,source_page=0):
                     else:
                         isd=False
                     charityName=""
+                    tax_deductible=""
+
                     for rc in result_charities:
                         if record[1]==rc[0]:
                             charityName=rc[1]
+                            if rc[2]==0.0:
+                                score="Not Available"
+                            else:
+                                score=rc[2]
+                            if rc[3]==0:
+                                td="No"
+                            else:
+                                td="Yes"
+
+
 
                     data3=(record[0],["MON","OTD"],)
 
                     # num_donor=get_query(query3,data3)
-                    num_donor=((5),)
+                    num_donor=((randint(0, 20)),)
 
                     if record[0] in user_drives:
                         userDrive=True
@@ -192,7 +205,9 @@ def get_drives(uid=0,source_page=0):
                     'causes':record[12].split(","),
                     'percentCompleted':float(record[6]/record[5]),'is_default':isd,
                     'numDonations':num_donor[0],
-                    'userSelected':userDrive
+                    'userSelected':userDrive,
+                    'charityNavigatorScore':score,
+                    'deductibility':td
                     }
                     drives.append(r)
         else:
@@ -216,8 +231,8 @@ def get_charity_drives(cid,uid=0):
 
         result=db_obj.get_query(query,data)
 
-        query2="Select charity_id,char_name from charity"
-        data2=None
+        query2="Select charity_id,char_name,charity_nav_score,tax_deductible from charity where charity_id=%s"
+        data2=(cid,)
 
         result_charities=db_obj.get_query(query2,data2)
 
@@ -247,11 +262,19 @@ def get_charity_drives(cid,uid=0):
                 for rc in result_charities:
                     if record[1]==rc[0]:
                         charityName=rc[1]
+                        if rc[2]==0.0:
+                            score="Not Available"
+                        else:
+                            score=rc[2]
+                        if rc[3]==0:
+                            td="No"
+                        else:
+                            td="Yes"
 
                 data3=(record[0],["MON","OTD"],)
 
                 # num_donor=get_query(query3,data3)
-                num_donor=((5),)
+                num_donor=((randint(0, 20)),)
 
                 if record[0] in user_drives:
                     userDrive=True
@@ -269,7 +292,9 @@ def get_charity_drives(cid,uid=0):
                 'percentCompleted':float(record[6]/record[5]),'is_default':isd,
                 'numDonations':num_donor[0],
                 'activeStatus':activeStatus,
-                'userSelected':userDrive
+                'userSelected':userDrive,
+                'charityNavigatorScore':score,
+                'deductibility':td
                 }
                 drives.append(r)
         else:
@@ -311,7 +336,7 @@ def get_recommended_drives(uid):
                 print("rd: ",result_drives)
             drive_ids=list(set(drives))
             if len(drive_ids)>0:
-                query3="Select A.*,B.char_name from drive A, charity B where drive_id in %s and A.charity_id=B.charity_id"
+                query3="Select A.*,B.char_name,B.charity_nav_score,B.tax_deductible from drive A, charity B where drive_id in %s and A.charity_id=B.charity_id"
                 data3 = (drive_ids,)
                 result_drives=db_obj.get_query(query3,data3)
 
@@ -319,18 +344,27 @@ def get_recommended_drives(uid):
 
                 for record in result_drives:
 
-                    num_donor=((5),)
+                    num_donor=((randint(0,20)),)
 
                     userDrive=False
 
                     if record[11]==1:
-                        if record[-1]:
+                        if record[-3]:
                             isd=True
                         else:
                             isd=False
 
+                        if record[-2]==0.0:
+                            score="Not Available"
+                        else:
+                            score=record[-2]
+                        if record[-1]==0:
+                            td="No"
+                        else:
+                            td="Yes"
+
                     r={'drive_id':record[0],'charity_id':record[1],'driveTitle':record[2],
-                    'charityName':record[-1],
+                    'charityName':record[-3],
                     'driveAbout': record[3],
                     'driveImageURL':record[4],
                     'targetMoney':record[5], 'currentMoney':record[6],
@@ -339,7 +373,9 @@ def get_recommended_drives(uid):
                     'causes':record[12].split(","),
                     'percentCompleted':float(record[6]/record[5]),'is_default':isd,
                     'numDonations':num_donor[0],
-                    'userSelected':userDrive
+                    'userSelected':userDrive,
+                    'charityNavigatorScore':score,
+                    'deductibility':td
                     }
                     drives.append(r)
 
