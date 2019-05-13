@@ -51,7 +51,7 @@ def get_charities(uid):
                 'charityCauses':record[12].split(","),
                 'charityType':ctype,
                 'charityNavigatorScore':score,
-                'deductibility ':td
+                'deductibility':td
                 }
                 charities.append(r)
         else:
