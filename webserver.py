@@ -482,8 +482,10 @@ def recommended_drives():
         try:
             #get all drives if no user_id
             if user_id is None or user_id==0:
+                print("why",user_id)
                 user_id=0
-                response["drives"]= get_drives(user_id,0)
+                # print("why",user_id)
+                # response["drives"]= get_drives(user_id,0)
             else:
                 response["drives"]= get_recommended_drives(user_id)
 
