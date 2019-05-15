@@ -628,6 +628,34 @@ def bir_test():
     return Response(result, status=status_code, mimetype='application/json')
 
 
+@app.route('/logout', methods=["POST"])
+def signin():
+    response={}
+    if request.headers['Content-Type'] == 'application/json':
+        arguments = request.get_json()
+        user_id=arguments.get("user_id")
+        status=""
+        try:
+            end_session(user_id,datetime.datetime.now())
+
+        except Exception as e:
+            status_code = 400
+            status = e
+            message="Logout Failed: {}".format(status)
+            logging.info(message)
+            response['message']=message
+
+    else:
+        status_code = 400
+        logging.warning("Bad Request Format")
+        response['message']="Bad Request Format"
+
+    result=json.dumps(response)
+    print(response)
+
+    return Response(result, status=status_code, mimetype='application/json')
+
+
 
 if __name__ == '__main__':
     app.run()
