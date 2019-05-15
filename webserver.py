@@ -631,7 +631,7 @@ def bir_test():
 
 
 @app.route('/logout', methods=["POST"])
-def signin():
+def signout():
     response={}
     if request.headers['Content-Type'] == 'application/json':
         arguments = request.get_json()
