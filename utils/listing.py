@@ -325,7 +325,11 @@ def get_recommended_drives(uid):
             # return get_drives(uid,0)
             cause_list=["Animals"]
         else:
-            cause_list=causes[0][0].split(",")
+            if causes[0][0] is None:
+                print("No causes found in db, , Falling back to causes - Animals")
+                cause_list=["Animals"]
+            else:
+                cause_list=causes[0][0].split(",")
         print(cause_list)
         drives=[]
         for cause in cause_list:
