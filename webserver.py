@@ -641,7 +641,7 @@ def signout():
         try:
             end_session(int(user_id),datetime.datetime.now())
             status_code = 200
-            message="Logout Successfull for user_id: {}".format(status)
+            message="Logout Successfull for user_id: {}".format(int(user_id))
             logging.info(message)
             response['message']=message
 
