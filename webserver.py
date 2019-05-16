@@ -481,14 +481,14 @@ def recommended_drives():
         response={}
         try:
             #get all drives if no user_id
-            if user_id is None or user_id==0:
-                print("why",user_id)
-                user_id=0
+            if user_id is None:
+                print("why user_id none")
                 # print("why",user_id)
                 # response["drives"]= get_drives(user_id,0)
-                response["drives"]= "No recommended drives"
+                # response["drives"]= "No recommended drives"
+                response["drives"]= get_recommended_drives(0)
             else:
-                response["drives"]= get_recommended_drives(user_id)
+                response["drives"]= get_recommended_drives(int(user_id))
 
             status_code = 200
             logging.info(response)
