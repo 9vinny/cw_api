@@ -319,7 +319,7 @@ def get_recommended_drives(uid):
 
         causes=db_obj.get_query(query,data)
 
-        print("causes:"causes)
+        print("causes:",causes)
         if causes[0][0] is None:
             print("No causes selected found")
             return get_drives(uid,0)
