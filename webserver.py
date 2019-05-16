@@ -639,12 +639,12 @@ def signout():
         user_id=arguments.get("user_id")
         status=""
         try:
-            end_session(user_id,datetime.datetime.now())
+            end_session(int(user_id),datetime.datetime.now())
 
         except Exception as e:
             status_code = 400
             status = e
-            message="Logout Failed: {}".format(status)
+            message="Logout Failed for user_id: {}".format(status)
             logging.info(message)
             response['message']=message
 
